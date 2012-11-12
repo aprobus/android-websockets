@@ -18,6 +18,7 @@ import org.json.JSONObject;
 
 import android.net.http.AndroidHttpClient;
 import android.os.Looper;
+import android.util.Log;
 
 public class SocketIOClient {
     public static interface Handler {
@@ -30,6 +31,7 @@ public class SocketIOClient {
         public void onError(Exception error);
     }
 
+    public static String TAG = "SocketIO";
     URI mURI;
     Handler mHandler;
     String mSession;
@@ -125,7 +127,11 @@ public class SocketIOClient {
                                 }
                             });
                         }
-                        mHandler.on(event, args);
+                        try {
+                        	mHandler.on(event, args);
+                        } catch (Exception e) {
+                        	Log.e(TAG, "Encountered error while handling event", e);
+                        }
                         break;
                     }
                     case 6:
@@ -169,6 +175,8 @@ public class SocketIOClient {
                         mClient.send("2:::");
                     }
                 }, mHeartbeat);
+                
+                mHandler.onConnect();
             }
         }, null);
         mClient.connect();
